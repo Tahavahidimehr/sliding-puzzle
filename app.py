@@ -1,8 +1,8 @@
 from copy import deepcopy
 
-mainPuzzle = [[1, 5, 3],
-              [4, 8, 6],
-              [7, 2, 0],
+mainPuzzle = [[1, 2, 3],
+              [7, 4, 8],
+              [6, 0, 5],
               ["", 0, 0]]
 
 explored = []
@@ -26,7 +26,7 @@ def findZiro(puzzle):
             if num == 0:
                 return {"r": puzzle.index(row), "c": row.index(num)}
 
-def chekTarget(puzzle):
+def checkTarget(puzzle):
     target = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
     if puzzle[0] == target[0]:
         if puzzle[1] == target[1]:
@@ -45,6 +45,7 @@ def makeMovements(puzzle, position):
     return filter(lambda x: x[0], movements)
 
 def move(puzzle, movements):
+    state = []
     for movement in movements:
         copy = deepcopy(puzzle)
         positions = movement[0]
@@ -53,26 +54,41 @@ def move(puzzle, movements):
         copy[positions["from"][0]][positions["from"][1]] = lastValue
         copy[3][0] += movement[1]
         copy[3][1] += 1
-        if chekTarget(copy):
-            print('puzzle done!')
-            printPuzzle(copy)
-            break
-        else:
-            printPuzzle(copy)
-        print("-------------")
+        state.append(copy)
+    return state
 
 def printPuzzle(puzzle):
     for i in puzzle:
         print(i)
 
+def checkExist(puzzle, searchable):
+    for item in searchable:
+        if item == puzzle.pop():
+            return True
+        else:
+            return False
+
 def solvePuzzle(puzzle):
-    if chekTarget(puzzle):
-        print('The puzzle was solved from the beginning!')
-    else:
-        printPuzzle(mainPuzzle)
-        print('$$$$$$$$$$$$$')
-        position = findZiro(puzzle)
-        movements = makeMovements(puzzle, position)
-        move(puzzle, movements)
+    position = findZiro(puzzle)
+    movements = makeMovements(puzzle, position)
+    state = move(puzzle, movements)
+    for item in state:
+        queue.append(item)
+    while True:
+        currentItem = queue[0]
+        print(currentItem)
+        if checkTarget(currentItem):
+            print('The puzzle was solved!')
+            break
+        else:
+            position = findZiro(currentItem)
+            movements = makeMovements(currentItem, position)
+            state = move(currentItem, movements)
+            queue.remove(currentItem)
+            explored.append(currentItem)
+            for newItem in state:
+                queue.append(newItem)
+    printPuzzle(currentItem)
+
 
 solvePuzzle(mainPuzzle)
